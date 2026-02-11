@@ -1,21 +1,104 @@
-body { font-family: 'Segoe UI', sans-serif; background-color: #f8f9fa; direction: rtl; padding: 20px; }
-.main-wrapper { display: flex; max-width: 1200px; margin: 0 auto; gap: 20px; flex-wrap: wrap; }
-.container, .timer-card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+body {
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    background-color: #f0f4f8;
+    margin: 0;
+    padding: 20px;
+    direction: rtl;
+}
+
+.main-wrapper {
+    display: flex;
+    max-width: 1200px;
+    margin: 0 auto;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.container, .timer-card {
+    background: white;
+    padding: 25px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+}
+
 .container { flex: 1.5; min-width: 350px; }
-.timer-card { flex: 1; min-width: 300px; position: sticky; top: 20px; height: fit-content; border-top: 10px solid #3498db; }
 
-.subject-input { display: flex; gap: 5px; margin-bottom: 10px; }
-input { padding: 10px; border: 1px solid #ddd; border-radius: 8px; width: 100%; }
-button { cursor: pointer; border: none; border-radius: 8px; transition: 0.3s; }
+.timer-card {
+    flex: 1;
+    min-width: 320px;
+    text-align: center;
+    position: sticky;
+    top: 20px;
+    height: fit-content;
+    border-top: 10px solid #3498db;
+}
 
-#timerDisplay { font-size: 3rem; font-weight: bold; margin: 10px 0; color: #2c3e50; }
+.input-group { margin-bottom: 20px; text-align: right; }
 
-/* قسم المهام داخل التايمر */
-.tasks-section { text-align: right; margin: 15px 0; border-top: 1px solid #eee; padding-top: 10px; }
-.task-item { display: flex; align-items: center; gap: 10 -px; margin: 5px 0; background: #f9f9f9; padding: 5px; border-radius: 5px; }
-.task-item input[type="checkbox"] { width: 20px; cursor: pointer; }
-.task-item.completed { text-decoration: line-through; opacity: 0.6; }
+.subject-input { display: flex; gap: 8px; margin-bottom: 10px; }
 
-.add-task-box { display: flex; gap: 5px; margin-top: 10px; }
-.active-task { border: 2px solid #3498db; background: #e3f2fd; }
-.schedule-item { padding: 10px; margin: 5px 0; border-right: 4px solid #3498db; background: #fff; }
+input {
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    width: 100%;
+    font-size: 16px;
+}
+
+button {
+    padding: 10px 15px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    background: #3498db;
+    color: white;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+button:hover { opacity: 0.9; }
+
+#timerDisplay {
+    font-size: 3.5rem;
+    font-weight: bold;
+    margin: 10px 0;
+    color: #2c3e50;
+    font-family: monospace;
+}
+
+.tasks-section {
+    text-align: right;
+    margin: 20px 0;
+    border-top: 1px solid #eee;
+    padding-top: 15px;
+}
+
+.task-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 8px 0;
+    background: #f9f9f9;
+    padding: 8px;
+    border-radius: 8px;
+}
+
+.task-item.completed span {
+    text-decoration: line-through;
+    color: #888;
+}
+
+.schedule-item {
+    padding: 15px;
+    margin: 10px 0;
+    border-right: 5px solid #3498db;
+    background: #fff;
+    border-radius: 0 10px 10px 0;
+    text-align: right;
+}
+
+.active-task { background: #e3f2fd; border-color: #1e88e5; }
+
+.rest-item { border-right-color: #2ecc71; }
+
+.timer-controls { display: flex; gap: 5px; justify-content: center; margin-top: 15px; }

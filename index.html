@@ -2,13 +2,14 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>منظم المذاكرة الذكي Pro</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="main-wrapper">
         <div class="container">
-            <h1>✍️ نظام المذاكرة المتقدم</h1>
+            <h1>📚 نظام المذاكرة المتقدم</h1>
             
             <div class="input-group">
                 <label>أضف المواد:</label>
@@ -33,7 +34,7 @@
         <div id="timerContainer" class="timer-card" style="display: none;">
             <h2 id="timerStatus">جاهز؟</h2>
             <div id="timerDisplay">00:00</div>
-            <p id="timerSubject" style="font-weight: bold; color: #3498db;"></p>
+            <p id="timerSubject" style="font-weight: bold; color: #3498db; margin-bottom: 10px;"></p>
             
             <div class="tasks-section">
                 <h4>📋 المهام لهذه الجلسة:</h4>
@@ -45,7 +46,8 @@
             </div>
 
             <div class="timer-controls">
-                <button onclick="toggleTimer()" id="startBtn">ابدأ</button>
+                <button onclick="toggleTimer()" id="startBtn">ابدأ الجلسة</button>
+                <button onclick="skipBreak()" id="skipBtn" style="display: none; background-color: #f39c12;">تخطي الاستراحة ⏭️</button>
                 <button onclick="resetTimer()" id="resetBtn">إعادة</button>
             </div>
             <audio id="alarmSound" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg"></audio>

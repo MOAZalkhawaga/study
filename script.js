@@ -1,198 +1,132 @@
-// المتغيرات العامة للتحكم في الحالة
 let timerInterval;
 let secondsLeft;
 let currentTasks = [];
 let currentTaskIndex = 0;
-let sessionTasksList = {}; // تخزين المهام لكل جلسة بناءً على Index الجلسة
+let sessionTasksList = {}; 
 
-// 1. وظيفة إضافة حقل مادة جديد في الواجهة
 function addSubjectField() {
     const container = document.getElementById('subjectsContainer');
     const div = document.createElement('div');
     div.className = 'subject-input';
-    div.innerHTML = `
-        <input type="text" class="subject-name" placeholder="اسم المادة">
-        <button type="button" onclick="this.parentElement.remove()" style="background:#ff7675; color:white">-</button>
-    `;
+    div.innerHTML = `<input type="text" class="subject-name" placeholder="اسم المادة">
+                     <button type="button" onclick="this.parentElement.remove()" style="background:#ff7675; color:white">-</button>`;
     container.appendChild(div);
 }
 
-// 2. وظيفة توليد الجدول وتقسيم الوقت
 function generateSchedule() {
     const subjectInputs = document.querySelectorAll('.subject-name');
     let hours = parseFloat(document.getElementById('totalHours').value);
     
-    // تطبيق سقف الـ 24 ساعة
-    if (hours > 24) {
-        hours = 24;
-        document.getElementById('totalHours').value = 24;
-    }
+    if (hours > 24) hours = 24;
     
     const subjects = Array.from(subjectInputs).map(input => input.value).filter(v => v);
-    if (subjects.length === 0 || !hours || hours <= 0) {
-        alert("الرجاء إدخال المواد وعدد الساعات بشكل صحيح!");
-        return;
-    }
+    if (subjects.length === 0 || !hours) return alert("أدخل البيانات بشكل صحيح!");
 
     const totalMinutes = hours * 60;
     const timePerSub = totalMinutes / subjects.length;
 
-    // تحديد نظام الوقت: 50/10 إذا كانت الساعات >= 5، وإلا 25/5
-    let workDuration = (hours >= 5) ? 50 : 25;
-    let breakDuration = (hours >= 5) ? 10 : 5;
+    let workTime = (hours >= 5) ? 50 : 25;
+    let breakTime = (hours >= 5) ? 10 : 5;
     
     currentTasks = [];
-    let html = "<h3>🗓️ جدول المذاكرة الذكي:</h3>";
+    let html = "<h3>🗓️ جدول المذاكرة:</h3>";
 
     subjects.forEach((sub) => {
         let timeLeftForSub = timePerSub;
-        html += `<div style="margin-top:15px; font-weight:bold; color:#2980b9; border-bottom:1px solid #eee;">📍 مادة: ${sub}</div>`;
+        html += `<div style="margin-top:15px; font-weight:bold; color:#2980b9">📍 ${sub}</div>`;
         
-        while (timeLeftForSub >= (workDuration + breakDuration)) {
+        while (timeLeftForSub >= (workTime + breakTime)) {
             const taskId = currentTasks.length;
-            // إضافة جلسة عمل
-            currentTasks.push({ title: sub, duration: workDuration, type: 'work' });
-            html += `<div class="schedule-item" id="item-${taskId}">📖 جلسة مذاكرة (${workDuration} د)</div>`;
+            currentTasks.push({ title: sub, duration: workTime, type: 'work' });
+            html += `<div class="schedule-item" id="item-${taskId}">📖 جلسة مذاكرة (${workTime} د)</div>`;
             
-            // إضافة جلسة راحة
-            currentTasks.push({ title: `استراحة (${sub})`, duration: breakDuration, type: 'break' });
-            html += `<div class="schedule-item rest-item" style="border-right-color:#2ecc71">☕ استراحة (${breakDuration} د)</div>`;
+            currentTasks.push({ title: `استراحة (${sub})`, duration: breakTime, type: 'break' });
+            html += `<div class="schedule-item rest-item" id="item-${currentTasks.length-1}">☕ استراحة (${breakTime} د)</div>`;
             
-            timeLeftForSub -= (workDuration + breakDuration);
-        }
-
-        // معالجة الوقت المتبقي الصغير للمادة
-        if (timeLeftForSub > 0) {
-            currentTasks.push({ title: sub, duration: Math.floor(timeLeftForSub), type: 'work' });
-            html += `<div class="schedule-item" id="item-${currentTasks.length-1}">📖 مراجعة ختامية (${Math.floor(timeLeftForSub)} د)</div>`;
+            timeLeftForSub -= (workTime + breakTime);
         }
     });
 
     document.getElementById('scheduleResult').innerHTML = html;
     document.getElementById('timerContainer').style.display = 'block';
-    
-    // تصفير المهام السابقة والبدء من أول جلسة
     sessionTasksList = {};
     startTask(0);
 }
 
-// 3. نظام إدارة المهام (Tasks) داخل التايمر
-function addTaskToSession() {
-    const input = document.getElementById('newTaskInput');
-    const taskText = input.value.trim();
-    if (!taskText) return;
-
-    if (!sessionTasksList[currentTaskIndex]) {
-        sessionTasksList[currentTaskIndex] = [];
-    }
-    
-    sessionTasksList[currentTaskIndex].push({ text: taskText, done: false });
-    input.value = "";
-    renderTasks();
-}
-
-function renderTasks() {
-    const container = document.getElementById('sessionTasks');
-    container.innerHTML = "";
-    const tasks = sessionTasksList[currentTaskIndex] || [];
-    
-    tasks.forEach((task, index) => {
-        const div = document.createElement('div');
-        div.className = `task-item ${task.done ? 'completed' : ''}`;
-        div.innerHTML = `
-            <input type="checkbox" ${task.done ? 'checked' : ''} onclick="toggleTaskDone(${index})">
-            <span>${task.text}</span>
-        `;
-        container.appendChild(div);
-    });
-}
-
-// 4. منطق إنهاء المهام والسؤال عن المراجعة أو الراحة المبكرة
-function toggleTaskDone(index) {
-    sessionTasksList[currentTaskIndex][index].done = !sessionTasksList[currentTaskIndex][index].done;
-    renderTasks();
-
-    // فحص هل انتهت كل المهام والتايمر لا يزال يعمل؟
-    const tasks = sessionTasksList[currentTaskIndex] || [];
-    const allDone = tasks.length > 0 && tasks.every(t => t.done);
-    const isTimerRunning = timerInterval !== null;
-
-    if (allDone && isTimerRunning && currentTasks[currentTaskIndex].type === 'work') {
-        setTimeout(() => {
-            const wantReview = confirm("عاش! خلصت مهامك قبل الوقت. حابب تكمل الوقت مراجعة؟ (لو ضغطت إلغاء هيبدأ البريك فوراً)");
-            if (!wantReview) {
-                handleSessionEnd(true); // إنهاء الجلسة فوراً
-            }
-        }, 300);
-    }
-}
-
-// 5. التحكم في التايمر
 function startTask(index) {
     if (index >= currentTasks.length) {
-        alert("🎉 مبروك! أتممت جدولك بنجاح.");
+        alert("🎉 مبروك! أتممت يومك الدراسي.");
         return;
     }
-
-    // تمييز الجلسة الحالية في الجدول
+    
     document.querySelectorAll('.schedule-item').forEach(el => el.classList.remove('active-task'));
-    const currentItem = document.getElementById(`item-${index}`);
-    if (currentItem) currentItem.classList.add('active-task');
+    const currentEl = document.getElementById(`item-${index}`);
+    if (currentEl) currentEl.classList.add('active-task');
 
     currentTaskIndex = index;
     const task = currentTasks[index];
     secondsLeft = task.duration * 60;
     
     document.getElementById('timerSubject').innerText = task.title;
-    document.getElementById('timerStatus').innerText = (task.type === 'work') ? "ركز في المذاكرة ✍️" : "وقت الراحة ☕";
+    document.getElementById('timerStatus').innerText = task.type === 'work' ? "حان وقت الجد!" : "وقت الراحة";
     
+    const skipBtn = document.getElementById('skipBtn');
+    skipBtn.style.display = (task.type === 'break') ? 'inline-block' : 'none';
+
     renderTasks();
     updateDisplay();
     pauseTimer();
 }
 
-function toggleTimer() {
-    const btn = document.getElementById('startBtn');
-    if (timerInterval) {
-        pauseTimer();
-    } else {
-        btn.innerText = "إيقاف مؤقت";
-        timerInterval = setInterval(() => {
-            secondsLeft--;
-            updateDisplay();
-            if (secondsLeft <= 0) {
-                handleSessionEnd();
-            }
-        }, 1000);
+function toggleTaskDone(index) {
+    sessionTasksList[currentTaskIndex][index].done = !sessionTasksList[currentTaskIndex][index].done;
+    renderTasks();
+
+    const tasks = sessionTasksList[currentTaskIndex] || [];
+    const allDone = tasks.length > 0 && tasks.every(t => t.done);
+    
+    if (allDone && timerInterval && currentTasks[currentTaskIndex].type === 'work') {
+        setTimeout(() => {
+            const review = confirm("أنهيت المهام مبكراً! هل تريد إكمال الوقت في المراجعة؟ (إلغاء يبدأ البريك الآن)");
+            if (!review) handleSessionEnd(true);
+        }, 300);
     }
 }
 
 function handleSessionEnd(forceSkip = false) {
     clearInterval(timerInterval);
     timerInterval = null;
-    document.getElementById('alarmSound').play();
+    if (!forceSkip) document.getElementById('alarmSound').play();
 
     const tasks = sessionTasksList[currentTaskIndex] || [];
-    const pendingTasks = tasks.filter(t => !t.done);
+    const pending = tasks.filter(t => !t.done);
 
-    // إذا انتهى الوقت الطبيعي وهناك مهام لم تكتمل
-    if (!forceSkip && currentTasks[currentTaskIndex].type === 'work' && pendingTasks.length > 0) {
-        const extraTime = confirm("الوقت خلص وفيه مهام لسا مخلصتش. محتاج 10 دقائق زيادة؟");
-        if (extraTime) {
+    if (!forceSkip && currentTasks[currentTaskIndex].type === 'work' && pending.length > 0) {
+        if (confirm("لم تنهِ المهام. هل تريد 10 دقائق إضافية؟")) {
             secondsLeft = 10 * 60;
             toggleTimer();
             return;
         }
     }
     
-    // الانتقال للجلسة التالية
     startTask(currentTaskIndex + 1);
-    
-    // إذا كانت الجلسة التالية استراحة، تبدأ تلقائياً
-    if (currentTasks[currentTaskIndex] && currentTasks[currentTaskIndex].type === 'break') {
-        toggleTimer();
+    if (currentTasks[currentTaskIndex]) toggleTimer();
+}
+
+function toggleTimer() {
+    if (timerInterval) {
+        pauseTimer();
+    } else {
+        document.getElementById('startBtn').innerText = "إيقاف";
+        timerInterval = setInterval(() => {
+            secondsLeft--;
+            updateDisplay();
+            if (secondsLeft <= 0) handleSessionEnd();
+        }, 1000);
     }
 }
+
+function skipBreak() { handleSessionEnd(true); }
 
 function updateDisplay() {
     const mins = Math.floor(secondsLeft / 60);
@@ -207,7 +141,24 @@ function pauseTimer() {
     document.getElementById('startBtn').innerText = "ابدأ الجلسة";
 }
 
-function resetTimer() {
-    pauseTimer();
-    startTask(currentTaskIndex);
+function resetTimer() { pauseTimer(); startTask(currentTaskIndex); }
+
+function addTaskToSession() {
+    const input = document.getElementById('newTaskInput');
+    if (!input.value.trim()) return;
+    if (!sessionTasksList[currentTaskIndex]) sessionTasksList[currentTaskIndex] = [];
+    sessionTasksList[currentTaskIndex].push({ text: input.value, done: false });
+    input.value = "";
+    renderTasks();
+}
+
+function renderTasks() {
+    const container = document.getElementById('sessionTasks');
+    container.innerHTML = "";
+    (sessionTasksList[currentTaskIndex] || []).forEach((task, i) => {
+        const div = document.createElement('div');
+        div.className = `task-item ${task.done ? 'completed' : ''}`;
+        div.innerHTML = `<input type="checkbox" ${task.done ? 'checked' : ''} onclick="toggleTaskDone(${i})"> <span>${task.text}</span>`;
+        container.appendChild(div);
+    });
 }
