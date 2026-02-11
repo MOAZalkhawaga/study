@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>منظم المذاكرة الذكي Pro</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="main-wrapper">
+        <div class="container">
+            <h1>✍️ نظام المذاكرة المتقدم</h1>
+            
+            <div class="input-group">
+                <label>أضف المواد:</label>
+                <div id="subjectsContainer">
+                    <div class="subject-input">
+                        <input type="text" class="subject-name" placeholder="اسم المادة">
+                        <button type="button" onclick="addSubjectField()">+</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>إجمالي الوقت (بحد أقصى 24 ساعة):</label>
+                <input type="number" id="totalHours" max="24" min="0.5" step="0.5" placeholder="مثلاً: 6">
+            </div>
+
+            <button id="generateBtn" onclick="generateSchedule()">توليد الجدول والبدء 🚀</button>
+
+            <div id="scheduleResult"></div>
+        </div>
+
+        <div id="timerContainer" class="timer-card" style="display: none;">
+            <h2 id="timerStatus">جاهز؟</h2>
+            <div id="timerDisplay">00:00</div>
+            <p id="timerSubject" style="font-weight: bold; color: #3498db;"></p>
+            
+            <div class="tasks-section">
+                <h4>📋 المهام لهذه الجلسة:</h4>
+                <div id="sessionTasks"></div>
+                <div class="add-task-box">
+                    <input type="text" id="newTaskInput" placeholder="أضف مهمة لهذه المادة...">
+                    <button onclick="addTaskToSession()">+</button>
+                </div>
+            </div>
+
+            <div class="timer-controls">
+                <button onclick="toggleTimer()" id="startBtn">ابدأ</button>
+                <button onclick="resetTimer()" id="resetBtn">إعادة</button>
+            </div>
+            <audio id="alarmSound" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg"></audio>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

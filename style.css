@@ -1,0 +1,21 @@
+body { font-family: 'Segoe UI', sans-serif; background-color: #f8f9fa; direction: rtl; padding: 20px; }
+.main-wrapper { display: flex; max-width: 1200px; margin: 0 auto; gap: 20px; flex-wrap: wrap; }
+.container, .timer-card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+.container { flex: 1.5; min-width: 350px; }
+.timer-card { flex: 1; min-width: 300px; position: sticky; top: 20px; height: fit-content; border-top: 10px solid #3498db; }
+
+.subject-input { display: flex; gap: 5px; margin-bottom: 10px; }
+input { padding: 10px; border: 1px solid #ddd; border-radius: 8px; width: 100%; }
+button { cursor: pointer; border: none; border-radius: 8px; transition: 0.3s; }
+
+#timerDisplay { font-size: 3rem; font-weight: bold; margin: 10px 0; color: #2c3e50; }
+
+/* قسم المهام داخل التايمر */
+.tasks-section { text-align: right; margin: 15px 0; border-top: 1px solid #eee; padding-top: 10px; }
+.task-item { display: flex; align-items: center; gap: 10 -px; margin: 5px 0; background: #f9f9f9; padding: 5px; border-radius: 5px; }
+.task-item input[type="checkbox"] { width: 20px; cursor: pointer; }
+.task-item.completed { text-decoration: line-through; opacity: 0.6; }
+
+.add-task-box { display: flex; gap: 5px; margin-top: 10px; }
+.active-task { border: 2px solid #3498db; background: #e3f2fd; }
+.schedule-item { padding: 10px; margin: 5px 0; border-right: 4px solid #3498db; background: #fff; }
